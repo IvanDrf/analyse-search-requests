@@ -8,4 +8,6 @@ import (
 
 type BadWordRepo interface {
 	SaveBadWords(ctx context.Context, words []*models.BadWord) error
+
+	Close()
 }

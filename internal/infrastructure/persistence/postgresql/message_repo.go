@@ -19,6 +19,10 @@ func NewMessageRepo(db *sql.DB) *messageRepo {
 	}
 }
 
+func (r *messageRepo) Close() {
+	r.db.Close()
+}
+
 func (r *messageRepo) SaveMessage(ctx context.Context, message *models.Message) error {
 	const query = `
 		INSERT INTO searches(search, date, status) VALUES ($1, $2, true) 

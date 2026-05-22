@@ -8,5 +8,9 @@ import (
 
 type MessageRepo interface {
 	SaveMessage(ctx context.Context, message *models.Message) error
+	UpdateSearchStatus(ctx context.Context, status models.MessageStatus, badWord *models.BadWord) error
+
 	FindMostPopularSearches(ctx context.Context, limit uint16) ([]*models.Message, error)
+
+	Close()
 }
