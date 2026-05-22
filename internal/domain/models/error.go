@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type ErrorCode int
 
 const (
@@ -8,6 +10,10 @@ const (
 )
 
 type Error struct {
-	Message string `json:"message"`
-	Code    int    `json:"code"`
+	Message string    `json:"message"`
+	Code    ErrorCode `json:"code"`
+}
+
+func (e Error) Error() string {
+	return fmt.Sprintf("message: %s, code: %d", e.Message, e.Code)
 }

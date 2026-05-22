@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Message struct {
 	SearchMessage string    `json:"search_message"`
