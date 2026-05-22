@@ -25,7 +25,7 @@ func (r *badWordRepo) Close() {
 
 func (r *badWordRepo) SaveBadWords(ctx context.Context, words []*models.BadWord) error {
 	const query = `
-		INSERT INTO bad_words(word) VALUES($1)
+		INSERT INTO bad_words(word) VALUES($1) ON CONFLICT DO NOTHING
 	`
 	args := createArgsFromWords(words)
 

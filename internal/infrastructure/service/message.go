@@ -10,12 +10,15 @@ import (
 
 type messageService struct {
 	messageRepo repo.MessageRepo
-	validator   *rules.MessageValidator
+	uof         repo.UnitOfWork
+
+	validator *rules.MessageValidator
 }
 
-func NewMessageService(repo repo.MessageRepo, validator *rules.MessageValidator) *messageService {
+func NewMessageService(repo repo.MessageRepo, uof repo.UnitOfWork, validator *rules.MessageValidator) *messageService {
 	return &messageService{
 		messageRepo: repo,
+		uof:         uof,
 		validator:   validator,
 	}
 }
