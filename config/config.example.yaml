@@ -1,0 +1,18 @@
+app:
+    host: localhost
+    port: 8080
+    logger_level: "DEBUG"
+
+database:
+    host: localhost
+    port: 5432
+    user: example_user
+    password: example_password
+    database: requests
+
+broker:
+    host: localhost
+    port: 6379
+    user: example_user
+    password: example_password
+    queue: requests_queue
