@@ -29,14 +29,7 @@ func (r *messageRepo) SaveMessage(ctx context.Context, message *models.Message) 
 		ON CONFLICT (search) DO UPDATE SET search_amount = search_amount + 1
 	`
 
-	res, err := r.db.ExecContext(ctx, query, message.SearchMessage, message.Date)
-	if _, e := res.RowsAffected(); e != nil {
-		slog.Error("any rows weren't affected by inserting new search", slog.String("error", e.Error()))
-		return models.Error{
-			Message: "no rows were affected by inserting new search",
-			Code:    models.ErrCodeInternal,
-		}
-	}
+	_, err := r.db.ExecContext(ctx, query, message.SearchMessage, message.Date)
 
 	if err != nil {
 		slog.Error("can't add new search", slog.String("error", err.Error()))
