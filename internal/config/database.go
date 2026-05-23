@@ -2,19 +2,15 @@ package config
 
 import "fmt"
 
-type PostgreSQLConfig struct {
+type RedisConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
 
-	User     string `yaml:"user"`
+	Username string `yaml:"username"`
 	Password string `yaml:"password"`
-
-	Database string `yaml:"database"`
+	Database int    `yaml:"db"`
 }
 
-func (d *PostgreSQLConfig) DSN() string {
-	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		d.User, d.Password, d.Host, d.Port, d.Database,
-	)
+func (c *RedisConfig) Addr() string {
+	return fmt.Sprintf("%s:%d", c.Host, c.Port)
 }

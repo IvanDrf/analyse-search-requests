@@ -8,9 +8,9 @@ import (
 )
 
 type Config struct {
-	App      AppConfig        `yaml:"app"`
-	Database PostgreSQLConfig `yaml:"database"`
-	Broker   RabbitMQConfig   `yaml:"broker"`
+	App      AppConfig      `yaml:"app"`
+	Database RedisConfig    `yaml:"database"`
+	Broker   RabbitMQConfig `yaml:"broker"`
 }
 
 func LoadFromYaml(path string) *Config {
