@@ -1,10 +1,12 @@
 app:
     host: localhost
     port: 8080
-    logger_level: "DEBUG"
     request_time: 10s
     search_duration: 5m
     search_interval: 5
+
+    logger_level: "DEBUG"
+    add_source: false
 
 database:
     host: localhost
@@ -13,7 +15,7 @@ database:
     password: ""
     database: 1
 
-    duplicate_time: 10m
+    duplicate_time: 7m
     bad_word_key: "bad_word_key"
 
 broker:

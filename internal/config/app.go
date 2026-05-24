@@ -11,4 +11,5 @@ type AppConfig struct {
 	SearchInterval int           `yaml:"search_interval"`
 
 	LoggerLevel string `yaml:"logger_level"`
+	AddSource   bool   `yaml:"add_source"`
 }
