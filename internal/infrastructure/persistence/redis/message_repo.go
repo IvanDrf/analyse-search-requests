@@ -65,13 +65,6 @@ func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) err
 		}
 	}
 
-	if err := r.client.Set(ctx, duplicate, true, r.duplicateTime).Err(); err != nil {
-		return models.Error{
-			Message: "can't set exp time for duplicate key",
-			Code:    models.ErrCodeInternal,
-		}
-	}
-
 	return nil
 }
 
