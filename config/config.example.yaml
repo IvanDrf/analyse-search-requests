@@ -1,0 +1,27 @@
+app:
+    host: localhost
+    port: 8080
+    request_time: 10s
+    search_duration: 5m
+    search_interval: 5
+
+    logger_level: "DEBUG"
+    add_source: false
+
+database:
+    host: localhost
+    port: 6379
+    user: ""
+    password: ""
+    database: 1
+
+    duplicate_time: 7m
+    bad_word_key: "bad_word_key"
+
+broker:
+    host: localhost
+    port: 5672
+    user: user
+    password: password
+    queue: searches_queue
+    workers: 10
