@@ -12,4 +12,6 @@ type SearchService interface {
 
 	SaveBadWord(ctx context.Context, badWord string) error
 	DeleteBadWord(ctx context.Context, badWord string) error
+
+	Close()
 }

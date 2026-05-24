@@ -24,13 +24,15 @@ type searchConsumer struct {
 
 func NewSearchConsumer(
 	conn *amqp091.Connection, ch *amqp091.Channel,
-	queue *amqp091.Queue, workers int,
+	queue *amqp091.Queue, searchService service.SearchService,
+	workers int,
 ) *searchConsumer {
 	return &searchConsumer{
-		conn:    conn,
-		ch:      ch,
-		queue:   queue,
-		workers: workers,
+		conn:          conn,
+		ch:            ch,
+		queue:         queue,
+		searchService: searchService,
+		workers:       workers,
 	}
 }
 
@@ -39,7 +41,7 @@ func (c *searchConsumer) Close() {
 	c.conn.Close()
 }
 
-func (c *searchConsumer) ReadMessages(ctx context.Context) error {
+func (c *searchConsumer) StartReadingMessages(ctx context.Context) error {
 	delivery, err := c.ch.Consume(c.queue.Name, "", false, false, false, false, nil)
 	if err != nil {
 		return models.Error{

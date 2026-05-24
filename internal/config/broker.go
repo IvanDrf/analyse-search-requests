@@ -9,7 +9,8 @@ type RabbitMQConfig struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 
-	Queue string `yaml:"queue"`
+	Queue   string `yaml:"queue"`
+	Workers int    `yaml:"workers"`
 }
 
 func (r *RabbitMQConfig) DSN() string {

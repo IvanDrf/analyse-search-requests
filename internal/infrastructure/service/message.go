@@ -17,12 +17,16 @@ type searchService struct {
 	validator *rules.MessageValidator
 }
 
-func NewMessageService(timeInterval int, repo repo.MessageRepo, validator *rules.MessageValidator) *searchService {
+func NewSearchService(timeInterval int, repo repo.MessageRepo, validator *rules.MessageValidator) *searchService {
 	return &searchService{
 		timeInterval: timeInterval,
 		messageRepo:  repo,
 		validator:    validator,
 	}
+}
+
+func (s *searchService) Close() {
+	s.messageRepo.Close()
 }
 
 func (s *searchService) SaveSearch(ctx context.Context, message *models.Message) error {

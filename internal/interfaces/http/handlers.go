@@ -17,6 +17,10 @@ type handlers struct {
 	requestTime   time.Duration
 }
 
+func (h *handlers) close() {
+	h.searchService.Close()
+}
+
 func NewHandlers(searchService service.SearchService, requestTime time.Duration) *handlers {
 	return &handlers{
 		searchService: searchService,

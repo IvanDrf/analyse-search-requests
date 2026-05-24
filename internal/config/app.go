@@ -7,7 +7,8 @@ type AppConfig struct {
 	Port int    `yaml:"port"`
 
 	RequestTime    time.Duration `yaml:"request_time"`
-	SearchInterval time.Duration `yaml:"search_duration"`
+	SearchDuration time.Duration `yaml:"search_duration"`
+	SearchInterval int           `yaml:"search_interval"`
 
 	LoggerLevel string `yaml:"logger_level"`
 }

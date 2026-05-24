@@ -17,16 +17,16 @@ type redisRepo struct {
 	expTime       time.Duration
 	duplicateTime time.Duration
 
-	lock *sync.Mutex
+	mx *sync.Mutex
 }
 
-func NewRedisRepo(client *redis.Client, badWordKey string, expTime time.Duration, duplicateTime time.Duration, lock *sync.Mutex) *redisRepo {
+func NewRedisRepo(client *redis.Client, badWordKey string, expTime time.Duration, duplicateTime time.Duration, mx *sync.Mutex) *redisRepo {
 	return &redisRepo{
 		client:        client,
 		badWordKey:    badWordKey,
 		expTime:       expTime,
 		duplicateTime: duplicateTime,
-		lock:          lock,
+		mx:            mx,
 	}
 }
 
@@ -71,8 +71,8 @@ func (r *redisRepo) FindMostPopularSearches(ctx context.Context, limit int, star
 	minutes := generateRangeMinutesKey(start, interval)
 	temp := generateTempKey(start)
 
-	r.lock.Lock()
-	defer r.lock.Unlock()
+	r.mx.Lock()
+	defer r.mx.Unlock()
 
 	if err := r.client.ZUnionStore(ctx, temp, &redis.ZStore{
 		Keys:      minutes,

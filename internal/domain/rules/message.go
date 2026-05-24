@@ -7,13 +7,10 @@ import (
 )
 
 type MessageValidator struct {
-	location *time.Location
 }
 
-func NewMessageValidator(location *time.Location) *MessageValidator {
-	return &MessageValidator{
-		location: location,
-	}
+func NewMessageValidator() *MessageValidator {
+	return &MessageValidator{}
 }
 
 func (v *MessageValidator) ValidateMessage(message *models.Message) error {
@@ -24,7 +21,7 @@ func (v *MessageValidator) ValidateMessage(message *models.Message) error {
 		}
 	}
 
-	now := time.Now().In(v.location)
+	now := time.Now().UTC()
 	if !now.After(message.Date) {
 		return models.Error{
 			Message: "message date is after current time",
