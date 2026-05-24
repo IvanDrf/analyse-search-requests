@@ -12,7 +12,7 @@ const (
 
 type Error struct {
 	Message string    `json:"message"`
-	Code    ErrorCode `json:"code"`
+	Code    ErrorCode `json:"-"`
 }
 
 func (e Error) Error() string {

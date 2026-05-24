@@ -2,7 +2,8 @@ app:
     host: localhost
     port: 8080
     logger_level: "DEBUG"
-    location: Russia/Moscow
+    request_time: 10s
+    search_duration: 5m
 
 database:
     host: localhost

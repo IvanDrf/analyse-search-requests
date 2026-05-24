@@ -1,9 +1,13 @@
 package config
 
+import "time"
+
 type AppConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
 
-	LoggerLevel string `yaml:"string"`
-	Location    string `yaml:"location"`
+	RequestTime    time.Duration `yaml:"request_time"`
+	SearchInterval time.Duration `yaml:"search_duration"`
+
+	LoggerLevel string `yaml:"logger_level"`
 }
