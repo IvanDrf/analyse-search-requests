@@ -7,6 +7,7 @@ type ErrorCode int
 const (
 	ErrCodeInternal ErrorCode = iota
 	ErrCodeInvalidArgument
+	ErrCodeDuplicateMessage
 )
 
 type Error struct {
