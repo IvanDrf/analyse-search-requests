@@ -38,12 +38,20 @@ func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) err
 	key := generateMinuteKey(message.Date)
 	duplicate := generateDuplicateKey(message)
 
-	res, err := r.client.Exists(ctx, duplicate).Result()
-	if res != 0 && err == nil {
+	ok, err := r.client.SetNX(ctx, duplicate, 1, r.duplicateTime).Result()
+	if err != nil {
+		return models.Error{
+			Message: "can't set duplicate key",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	if !ok {
 		return nil
 	}
 
-	if err := r.client.ZIncrBy(ctx, key, 1, message.SearchMessage); err != nil {
+	if err := r.client.ZIncrBy(ctx, key, 1, message.SearchMessage).Err(); err != nil {
+		r.client.Del(ctx, duplicate)
 		return models.Error{
 			Message: "can't save new search message",
 			Code:    models.ErrCodeInternal,
@@ -147,7 +155,7 @@ func (r *redisRepo) filterSearches(ctx context.Context, raws []redis.Z, limit in
 
 		res = append(res, &models.SearchMessage{
 			SearchMessage: searchMessage,
-			Amount:        uint16(raws[i].Score),
+			Amount:        uint64(raws[i].Score),
 		})
 
 		if len(res) == limit {
@@ -174,7 +182,7 @@ func generateTempKey(start time.Time) string {
 }
 
 func generateMinuteKey(date time.Time) string {
-	return fmt.Sprintf("search:%s", date.Format("202605231530"))
+	return fmt.Sprintf("search:%s", date.Format("200601021504"))
 }
 
 func generateDuplicateKey(message *models.Message) string {

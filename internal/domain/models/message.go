@@ -21,5 +21,5 @@ type Message struct {
 
 type SearchMessage struct {
 	SearchMessage string `json:"search_message"`
-	Amount        uint16 `json:"amount"`
+	Amount        uint64 `json:"amount"`
 }

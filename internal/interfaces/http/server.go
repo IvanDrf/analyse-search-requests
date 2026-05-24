@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +11,7 @@ type SearchServer struct {
 	host string
 	port int
 
-	mux      http.ServeMux
+	mux      *http.ServeMux
 	server   http.Server
 	handlers *handlers
 }
@@ -20,7 +21,7 @@ func NewSearchServer(host string, port int, handlers *handlers) *SearchServer {
 		host: host,
 		port: port,
 
-		mux:      *http.NewServeMux(),
+		mux:      http.NewServeMux(),
 		server:   http.Server{},
 		handlers: handlers,
 	}
@@ -31,6 +32,8 @@ func (s *SearchServer) registerRoutes() {
 	s.mux.HandleFunc("DELETE /api/v1/bad", s.handlers.deleteBadWord)
 
 	s.mux.HandleFunc("GET /api/v1/searches", s.handlers.findMostPopularSearches)
+
+	s.server.Handler = s.mux
 }
 
 func (s *SearchServer) Start() {
@@ -43,6 +46,6 @@ func (s *SearchServer) Start() {
 }
 
 func (s *SearchServer) Stop() {
-	s.server.Close()
+	s.server.Shutdown(context.Background())
 	s.handlers.close()
 }
