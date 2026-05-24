@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,4 +23,8 @@ type Message struct {
 type SearchMessage struct {
 	SearchMessage string `json:"search_message"`
 	Amount        uint64 `json:"amount"`
+}
+
+func (m *Message) Normalize() {
+	m.SearchMessage = strings.ToLower(m.SearchMessage)
 }

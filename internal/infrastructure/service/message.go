@@ -34,6 +34,8 @@ func (s *searchService) SaveSearch(ctx context.Context, message *models.Message)
 		return err
 	}
 
+	message.Normalize()
+
 	if err := s.messageRepo.SaveSearch(ctx, message); err != nil {
 		return models.Error{
 			Message: "can't save message",

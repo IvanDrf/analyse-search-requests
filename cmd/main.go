@@ -33,6 +33,6 @@ func main() {
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGABRT)
 	<-stop
 
-	slog.Info("Stop service")
+	slog.Info("Stop service", slog.Int("port", config.App.Port))
 	app.Stop()
 }
