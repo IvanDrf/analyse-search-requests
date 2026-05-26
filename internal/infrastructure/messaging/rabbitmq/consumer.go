@@ -74,15 +74,18 @@ func (c *searchConsumer) worker(ctx context.Context, delivery <-chan amqp091.Del
 			}
 
 			if err := c.processMessage(ctx, message); err != nil {
-				slog.Error("", slog.String("error", err.Error()))
+				slog.Error("SearchConsumer:worker", slog.String("error", err.Error()))
 			}
 		}
 	}
 }
 
 func (c *searchConsumer) processMessage(ctx context.Context, message amqp091.Delivery) error {
+	slog.Info("SearchConsumer:processMessage", slog.String("search_id", message.MessageId))
+
 	search := models.Message{}
 	if err := json.Unmarshal(message.Body, &search); err != nil {
+		slog.Error("SearchConsumer:processMessage", slog.String("error", err.Error()))
 		message.Ack(false)
 		return models.Error{
 			Message: fmt.Sprintf("can't parse incoming message from queue, error=%s", err),
@@ -90,12 +93,14 @@ func (c *searchConsumer) processMessage(ctx context.Context, message amqp091.Del
 	}
 
 	if err := c.searchService.SaveSearch(ctx, &search); err != nil {
+		slog.Error("SearchConsumer:processMessage", slog.String("error", err.Error()))
 		message.Nack(false, true)
 		return models.Error{
 			Message: fmt.Sprintf("can't save new search error=%s", err),
 		}
 	}
 
+	slog.Info("SearchConsumer:processMessage", slog.String("status", "successfully processed message"))
 	message.Ack(false)
 	return nil
 }
