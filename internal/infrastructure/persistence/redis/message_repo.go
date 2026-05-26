@@ -3,6 +3,8 @@ package redis
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"strings"
 	"sync"
 	"time"
 
@@ -134,15 +136,32 @@ func (r *redisRepo) filterSearches(ctx context.Context, raws []redis.Z, limit in
 			}
 		}
 
-		bad, err := r.client.SIsMember(ctx, r.badWordKey, searchMessage).Result()
+		skip, err := r.client.SIsMember(ctx, r.badWordKey, searchMessage).Result()
 		if err != nil {
+			slog.Error("RedisRepo", slog.String("error", err.Error()))
 			return nil, models.Error{
 				Message: "can't check stop word in redis",
 				Code:    models.ErrCodeInternal,
 			}
 		}
 
-		if bad {
+		for word := range strings.SplitSeq(searchMessage, " ") {
+			slog.Info("", slog.String("word", word))
+			skip, err = r.client.SIsMember(ctx, r.badWordKey, word).Result()
+			if err != nil {
+				slog.Error("RedisRepo", slog.String("error", err.Error()))
+				return nil, models.Error{
+					Message: "can't check stop word in redis",
+					Code:    models.ErrCodeInternal,
+				}
+			}
+
+			if skip {
+				break
+			}
+		}
+
+		if skip {
 			continue
 		}
 

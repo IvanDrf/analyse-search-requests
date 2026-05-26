@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/IvanDrf/analyse-search-requests/internal/domain/models"
@@ -54,6 +55,7 @@ func (s *searchService) FindMostPopularSearches(ctx context.Context, limit int) 
 	now := time.Now().UTC()
 	searches, err := s.messageRepo.FindMostPopularSearches(ctx, limit, now, s.timeInterval)
 	if err != nil {
+		slog.Error("SearchService", slog.String("error", err.Error()))
 		return nil, models.Error{
 			Message: "can't find most popular searches",
 			Code:    models.ErrCodeInternal,
