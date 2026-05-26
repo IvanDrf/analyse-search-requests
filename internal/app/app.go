@@ -9,8 +9,9 @@ import (
 )
 
 type App struct {
-	server   *http.SearchServer
-	consumer messaging.MessageConsumer
+	searchserver  *http.SearchServer
+	metricsServer *http.MetricsServer
+	consumer      messaging.MessageConsumer
 }
 
 func NewApp(config *config.Config) *App {
@@ -20,11 +21,14 @@ func NewApp(config *config.Config) *App {
 }
 
 func (a *App) Run(ctx context.Context) {
-	go a.server.Start()
+	go a.metricsServer.Start()
+	go a.searchserver.Start()
 	go a.consumer.StartReadingMessages(ctx)
 }
 
-func (a *App) Stop() {
-	a.server.Stop()
+func (a *App) Stop(ctx context.Context) {
+	a.searchserver.Stop(ctx)
+	a.metricsServer.Stop(ctx)
+
 	a.consumer.Close()
 }

@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"log"
+	"log/slog"
 
 	"github.com/IvanDrf/analyse-search-requests/internal/config"
 	"github.com/rabbitmq/amqp091-go"
@@ -26,5 +27,6 @@ func Connect(config *config.RabbitMQConfig) (*amqp091.Connection, *amqp091.Chann
 		log.Fatalf("can't declare queue, error=%s", err)
 	}
 
+	slog.Info("successfully connected to rabbitmq", slog.String("host", config.Host), slog.Int("port", config.Port))
 	return conn, ch, &queue
 }

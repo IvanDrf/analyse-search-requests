@@ -11,6 +11,7 @@ type Config struct {
 	App      AppConfig      `yaml:"app"`
 	Database RedisConfig    `yaml:"database"`
 	Broker   RabbitMQConfig `yaml:"broker"`
+	Metrics  MetricsConfig  `yaml:"metrics"`
 }
 
 func LoadFromYaml(path string) *Config {

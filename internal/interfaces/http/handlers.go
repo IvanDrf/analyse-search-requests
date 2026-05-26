@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -19,6 +20,7 @@ type handlers struct {
 
 func (h *handlers) close() {
 	h.searchService.Close()
+	slog.Info("Handlers:close", slog.String("status", "successfully closed handlers"))
 }
 
 func NewHandlers(searchService service.SearchService, requestTime time.Duration) *handlers {
@@ -28,7 +30,7 @@ func NewHandlers(searchService service.SearchService, requestTime time.Duration)
 	}
 }
 
-func (h handlers) saveBadWord(w http.ResponseWriter, req *http.Request) {
+func (h *handlers) saveBadWord(w http.ResponseWriter, req *http.Request) {
 	if !isContentTypeJSON(req) {
 		writeError(w, http.StatusUnsupportedMediaType, &models.Error{
 			Message: "invalid medida type, supported: JSON",

@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/IvanDrf/analyse-search-requests/internal/config"
@@ -26,5 +27,6 @@ func Connect(config *config.RedisConfig) *redis.Client {
 		log.Fatalf("can't ping redis database, error=%s", err)
 	}
 
+	slog.Info("successfully connected to redis", slog.String("host", config.Host), slog.Int("port", config.Port))
 	return client
 }

@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "analyse-search-requests"
+    static_configs:
+      - targets: ["app:2112"]
