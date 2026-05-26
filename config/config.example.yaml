@@ -8,6 +8,10 @@ app:
     logger_level: "DEBUG"
     add_source: false
 
+metrics:
+    host: localhost
+    port: 2112
+
 database:
     host: localhost
     port: 6379

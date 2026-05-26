@@ -23,12 +23,14 @@ func (f *fabric) NewApp() *App {
 	searchRepo := f.newRepo()
 	searchService := f.newSearchService(searchRepo, f.newMessageValidator())
 
-	server := f.newSearchServer(searchService)
+	searchServer := f.newSearchServer(searchService)
+	metricsServer := f.newMetricsServer()
 	consumer := f.newConsumer(searchService)
 
 	return &App{
-		server:   server,
-		consumer: consumer,
+		searchserver:  searchServer,
+		metricsServer: metricsServer,
+		consumer:      consumer,
 	}
 }
 
@@ -36,6 +38,10 @@ func (f *fabric) newSearchServer(searchService service.SearchService) *http.Sear
 	handlers := http.NewHandlers(searchService, f.config.App.RequestTime)
 
 	return http.NewSearchServer(f.config.App.Host, f.config.App.Port, handlers)
+}
+
+func (f *fabric) newMetricsServer() *http.MetricsServer {
+	return http.NewMetricsServer(f.config.Metrics.Host, f.config.Metrics.Port)
 }
 
 func (f *fabric) newConsumer(serachService service.SearchService) messaging.MessageConsumer {
