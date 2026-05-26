@@ -28,7 +28,7 @@ func NewHandlers(searchService service.SearchService, requestTime time.Duration)
 	}
 }
 
-func (h handlers) saveBadWord(w http.ResponseWriter, req *http.Request) {
+func (h *handlers) saveBadWord(w http.ResponseWriter, req *http.Request) {
 	if !isContentTypeJSON(req) {
 		writeError(w, http.StatusUnsupportedMediaType, &models.Error{
 			Message: "invalid medida type, supported: JSON",

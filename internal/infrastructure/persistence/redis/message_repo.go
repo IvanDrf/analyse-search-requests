@@ -37,11 +37,14 @@ func (r *redisRepo) Close() {
 }
 
 func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) error {
+	slog.Info("RedisRepo:SaveSearch", slog.String("search", message.SearchMessage))
+
 	key := generateMinuteKey(message.Date)
 	duplicate := generateDuplicateKey(message)
 
 	ok, err := r.client.SetNX(ctx, duplicate, 1, r.duplicateTime).Result()
 	if err != nil {
+		slog.Error("RedisRepo:SaveSearch", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't set duplicate key",
 			Code:    models.ErrCodeInternal,
@@ -49,11 +52,14 @@ func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) err
 	}
 
 	if !ok {
+		slog.Info("RedisRepo:SaveSearch", slog.String("status", "search already saved"), slog.String("search", message.SearchMessage))
 		return nil
 	}
 
 	if err := r.client.ZIncrBy(ctx, key, 1, message.SearchMessage).Err(); err != nil {
 		r.client.Del(ctx, duplicate)
+
+		slog.Error("RedisRepo:SaveSearch", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't save new search message",
 			Code:    models.ErrCodeInternal,
@@ -61,16 +67,20 @@ func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) err
 	}
 
 	if err := r.client.Expire(ctx, key, r.expTime).Err(); err != nil {
+		slog.Error("RedisRepo:SaveSearch", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't add exp time for search message",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
+	slog.Info("RedisRepo:SaveSearch", slog.String("search", message.SearchMessage), slog.String("status", "successfully save search"))
 	return nil
 }
 
 func (r *redisRepo) FindMostPopularSearches(ctx context.Context, limit int, start time.Time, interval int) ([]*models.SearchMessage, error) {
+	slog.Info("RedisRepo:FindMostPopularSearches", slog.Int("limit", limit))
+
 	minutes := generateRangeMinutesKey(start, interval)
 	temp := generateTempKey(start)
 
@@ -81,6 +91,7 @@ func (r *redisRepo) FindMostPopularSearches(ctx context.Context, limit int, star
 		Keys:      minutes,
 		Aggregate: "SUM",
 	}).Err(); err != nil {
+		slog.Error("RedisRepo:FindMostPopularSearches", slog.String("error", err.Error()))
 		return nil, models.Error{
 			Message: "can't create union storage",
 			Code:    models.ErrCodeInternal,
@@ -91,9 +102,10 @@ func (r *redisRepo) FindMostPopularSearches(ctx context.Context, limit int, star
 		r.client.Del(context.Background(), temp)
 	}()
 
-	size := limit * 2
+	size := limit * 3
 	raws, err := r.client.ZRevRangeWithScores(ctx, temp, 0, int64(size-1)).Result()
 	if err != nil {
+		slog.Error("RedisRepo:FindMostPopularSearches", slog.String("error", err.Error()))
 		return nil, models.Error{
 			Message: "can't make range with scores",
 			Code:    models.ErrCodeInternal,
@@ -105,6 +117,7 @@ func (r *redisRepo) FindMostPopularSearches(ctx context.Context, limit int, star
 
 func (r *redisRepo) SaveBadWord(ctx context.Context, badWord string) error {
 	if err := r.client.SAdd(ctx, r.badWordKey, badWord).Err(); err != nil {
+		slog.Error("RedisRepo:SaveBadWord", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't save bad word in redis",
 			Code:    models.ErrCodeInternal,
@@ -116,6 +129,7 @@ func (r *redisRepo) SaveBadWord(ctx context.Context, badWord string) error {
 
 func (r *redisRepo) DeleteBadWord(ctx context.Context, badWord string) error {
 	if err := r.client.SRem(ctx, r.badWordKey, badWord).Err(); err != nil {
+		slog.Error("RedisRepo:DeleteBadWord", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't delete bad word in redis",
 			Code:    models.ErrCodeInternal,
@@ -130,6 +144,7 @@ func (r *redisRepo) filterSearches(ctx context.Context, raws []redis.Z, limit in
 	for i := range raws {
 		searchMessage, ok := raws[i].Member.(string)
 		if !ok {
+			slog.Error("RedisRepo:filterSearches", slog.String("error", "invalid searches in redis"))
 			return nil, models.Error{
 				Message: "invalid searches in redis",
 				Code:    models.ErrCodeInternal,
@@ -138,7 +153,7 @@ func (r *redisRepo) filterSearches(ctx context.Context, raws []redis.Z, limit in
 
 		skip, err := r.client.SIsMember(ctx, r.badWordKey, searchMessage).Result()
 		if err != nil {
-			slog.Error("RedisRepo", slog.String("error", err.Error()))
+			slog.Error("RedisRepo:filterSearches", slog.String("error", err.Error()))
 			return nil, models.Error{
 				Message: "can't check stop word in redis",
 				Code:    models.ErrCodeInternal,
@@ -146,10 +161,9 @@ func (r *redisRepo) filterSearches(ctx context.Context, raws []redis.Z, limit in
 		}
 
 		for word := range strings.SplitSeq(searchMessage, " ") {
-			slog.Info("", slog.String("word", word))
 			skip, err = r.client.SIsMember(ctx, r.badWordKey, word).Result()
 			if err != nil {
-				slog.Error("RedisRepo", slog.String("error", err.Error()))
+				slog.Error("RedisRepo:filterSearches", slog.String("error", err.Error()))
 				return nil, models.Error{
 					Message: "can't check stop word in redis",
 					Code:    models.ErrCodeInternal,
