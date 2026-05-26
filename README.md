@@ -22,35 +22,39 @@ cat example.env > .env
 touch config/config.yaml
 ```
 
-4) Напишите данные в конфиг
+4) Напишите данные в конфиг (config/config.yaml)
 ```yaml
 app:
-    host: 0.0.0.0 # 0.0.0.0 если в docker-compose, localhost если локально
-    port: 8080 #должен совпадать с APP_PORT в .env
-    request_time: 10s
-    search_duration: 5m
-    search_interval: 5
+  host: 0.0.0.0 # 0.0.0.0 если в docker-compose, localhost если локально
+  port: 8080 #должен совпадать с APP_PORT в .env
+  request_time: 10s
+  search_duration: 5m
+  search_interval: 5  
 
-    logger_level: "DEBUG"
-    add_source: false
+  logger_level: "DEBUG"
+  add_source: false
+
+metrics:
+  host: 0.0.0.0 # 0.0.0.0 если в docker-compose, localhost если локально
+  port: 2112
 
 database:
-    host: database # database если в docker-compose, localhost если локально
-    port: 6379 # должен совпадать с REDIS_PORT в .env
-    user: ""
-    password: ""
-    database: 1
+  host: database # database если в docker-compose, localhost если локально
+  port: 6379 # должен совпадать с REDIS_PORT в .env
+  user: ""
+  password: ""
+  database: 1
 
-    duplicate_time: 7m
-    bad_word_key: "bad_word_key"
+  duplicate_time: 7m
+  bad_word_key: "bad_word_key"
 
 broker:
-    host: broker # broker если в docker-compose, localhost если локально
-    port: 5672 # должен совпадать с RABBITMQ_PORT в .env
-    user: user # пользователь должен совпадать с RABBITMQ_USER в .env
-    password: "123" # пароль должен совпадать с RABBITMQ_PASSWORD в .env
-    queue: searches_queue
-    workers: 10
+  host: broker # broker если в docker-compose, localhost если локально
+  port: 5672 # должен совпадать с RABBITMQ_PORT в .env
+  user: user # пользователь должен совпадать с RABBITMQ_USER в .env
+  password: "123" # пароль должен совпадать с RABBITMQ_PASSWORD в .env
+  queue: searches_queue
+  workers: 10
 ```
 
 5) Запустите контейнеры
@@ -155,8 +159,8 @@ GET /api/v1/searches?limit=N
 
 ```bash
 ├── cmd
-│   └── main.go # точка запуска приложения
-├── config # конфиги
+│   └── main.go
+├── config
 │   ├── config.example.yaml
 │   └── config.yaml
 ├── docker-compose.yaml
@@ -166,32 +170,34 @@ GET /api/v1/searches?limit=N
 ├── go.sum
 ├── internal
 │   ├── app
-│   │   ├── app.go # приложение
-│   │   └── fabric.go # сборка приложения по компонентам
-│   ├── config # работа с конфигом
+│   │   ├── app.go
+│   │   └── fabric.go
+│   ├── config
 │   │   ├── app.go
 │   │   ├── broker.go
 │   │   ├── config.go
-│   │   └── database.go
-│   ├── domain # основная бизнес-логика
-│   │   ├── models # модели
+│   │   ├── database.go
+│   │   └── metrics.go
+│   ├── domain
+│   │   ├── models
 │   │   │   ├── bad_word.go
 │   │   │   ├── error.go
 │   │   │   └── message.go
-│   │   ├── ports # интерфейсы бизне логики
+│   │   ├── ports
 │   │   │   ├── messaging
 │   │   │   │   └── consumer.go
 │   │   │   ├── repo
 │   │   │   │   └── message.go
 │   │   │   └── service
 │   │   │       └── message.go
-│   │   └── rules # бизнес-правила
+│   │   └── rules
 │   │       ├── bad_word.go
 │   │       ├── limit.go
 │   │       └── message.go
-│   ├── infrastructure # реализация бизнес-логики
+│   ├── infrastructure
 │   │   ├── adapters
-│   │   │   └── logger.go
+│   │   │   ├── logger.go
+│   │   │   └── metrics.go
 │   │   ├── messaging
 │   │   │   └── rabbitmq
 │   │   │       ├── connect.go
@@ -202,11 +208,15 @@ GET /api/v1/searches?limit=N
 │   │   │       └── message_repo.go
 │   │   └── service
 │   │       └── message.go
-│   └── interfaces # HTTP API
+│   └── interfaces
 │       └── http
 │           ├── handlers.go
-│           ├── server.go
+│           ├── metrics_server.go
+│           ├── middleware
+│           │   └── metrics.go
+│           ├── search_server.go
 │           └── utils.go
 ├── LICENSE
+├── prometheus.yaml
 └── README.md
 ```
