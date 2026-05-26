@@ -28,6 +28,7 @@ func NewSearchService(timeInterval int, repo repo.MessageRepo, validator *rules.
 
 func (s *searchService) Close() {
 	s.messageRepo.Close()
+	slog.Info("SearchService:Close", slog.String("status", "successfully closed search service"))
 }
 
 func (s *searchService) SaveSearch(ctx context.Context, message *models.Message) error {

@@ -34,5 +34,5 @@ func main() {
 	<-stop
 
 	slog.Info("Stop service", slog.Int("port", config.App.Port))
-	app.Stop()
+	app.Stop(ctx)
 }

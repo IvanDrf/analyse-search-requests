@@ -24,7 +24,7 @@ func (a *App) Run(ctx context.Context) {
 	go a.consumer.StartReadingMessages(ctx)
 }
 
-func (a *App) Stop() {
-	a.server.Stop()
+func (a *App) Stop(ctx context.Context) {
+	a.server.Stop(ctx)
 	a.consumer.Close()
 }

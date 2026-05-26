@@ -39,6 +39,8 @@ func NewSearchConsumer(
 func (c *searchConsumer) Close() {
 	c.ch.Close()
 	c.conn.Close()
+
+	slog.Info("SearchConsumer:Close", slog.String("status", "successfully closed search consumer"))
 }
 
 func (c *searchConsumer) StartReadingMessages(ctx context.Context) error {

@@ -34,6 +34,7 @@ func NewRedisRepo(client *redis.Client, badWordKey string, expTime time.Duration
 
 func (r *redisRepo) Close() {
 	r.client.Close()
+	slog.Info("RedisRepo:Close", slog.String("status", "successfully closed redis repo"))
 }
 
 func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) error {
@@ -74,7 +75,7 @@ func (r *redisRepo) SaveSearch(ctx context.Context, message *models.Message) err
 		}
 	}
 
-	slog.Info("RedisRepo:SaveSearch", slog.String("search", message.SearchMessage), slog.String("status", "successfully save search"))
+	slog.Info("RedisRepo:SaveSearch", slog.String("search", message.SearchMessage), slog.String("status", "successfully saved search"))
 	return nil
 }
 
@@ -124,6 +125,7 @@ func (r *redisRepo) SaveBadWord(ctx context.Context, badWord string) error {
 		}
 	}
 
+	slog.Info("RedisRepo:SaveBadWord", slog.String("status", "successfully saved bad word"))
 	return nil
 }
 
@@ -136,6 +138,7 @@ func (r *redisRepo) DeleteBadWord(ctx context.Context, badWord string) error {
 		}
 	}
 
+	slog.Info("RedisRepo:SaveBadWord", slog.String("status", "successfully deleted bad word"))
 	return nil
 }
 

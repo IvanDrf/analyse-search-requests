@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -45,7 +46,9 @@ func (s *SearchServer) Start() {
 	}
 }
 
-func (s *SearchServer) Stop() {
-	s.server.Shutdown(context.Background())
+func (s *SearchServer) Stop(ctx context.Context) {
+	s.server.Shutdown(ctx)
 	s.handlers.close()
+
+	slog.Info("SearchServer:Stop", slog.String("status", "successfully stopped search server"))
 }
