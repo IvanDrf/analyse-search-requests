@@ -36,11 +36,22 @@ services:
       retries: 10
       start_period: 5s
 
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: searches_prometheus
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - searches_network
+
   app:
     build: .
     container_name: searches_app
     ports:
       - "${APP_PORT}:8080"
+      - "${METRICS_PORT}:2112"
     depends_on:
       broker:
         condition: service_healthy
